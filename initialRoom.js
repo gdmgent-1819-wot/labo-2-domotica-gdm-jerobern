@@ -1,4 +1,4 @@
-{
+const initialRoom = {
   "active_room" : {
     "alarm" : false,
     "doors" : [ {

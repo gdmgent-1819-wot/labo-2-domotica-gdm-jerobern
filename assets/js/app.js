@@ -4,10 +4,18 @@
         init: function () {
             console.log("Initializing application");
             firebase.initializeApp(firebaseConfig);
+            // Check if database has a value for active_room
+            firebase.database().ref('active_room').once('value').then(snapshot => {
+                if (!snapshot.val()) {
+                    console.log('Database was empty, setting initial data');
+                    firebase.database().ref().set(initialRoom);
+                }
+            })
             this.loadLights();
             this.loadOutlets();
             this.loadDoors();
             this.loadAlarm();
+
         },
 
         loadLights: function () {
@@ -16,12 +24,13 @@
             firebase.database().ref('active_room/lights').on('value', snapshot => {
                 lightsContainer.innerHTML = ''
                 const lights = snapshot.val();
-                // Render each light in the DOM
-                for (let i = 0; i < lights.length; i++) {
-                    let btnText = lights[i].is_on ? "On" : "Off";
-                    let btnClass = lights[i].is_on ? "btn-warning" : "btn-outline-warning";
-                    let status = lights[i].is_on ? "true" : "false";
-                    lightsContainer.innerHTML += `
+                if (lights) {
+                    // Render each light in the DOM
+                    for (let i = 0; i < lights.length; i++) {
+                        let btnText = lights[i].is_on ? "On" : "Off";
+                        let btnClass = lights[i].is_on ? "btn-warning" : "btn-outline-warning";
+                        let status = lights[i].is_on ? "true" : "false";
+                        lightsContainer.innerHTML += `
                     <div class="form-group form-row">
                         <label for="lightBtn${i}" class="col-sm-6 col-form-label">Light ${i + 1}</label>
                         <div class="col-sm-6">
@@ -29,8 +38,9 @@
                         </div>
                     </div>
                     `
+                    }
+                    this.addEventListeners('.light');
                 }
-                this.addEventListeners('.light');
             });
         },
 
@@ -40,12 +50,13 @@
             firebase.database().ref('active_room/outlets').on('value', snapshot => {
                 outletsContainer.innerHTML = ''
                 const outlets = snapshot.val();
-                // Render each light in the DOM
-                for (let i = 0; i < outlets.length; i++) {
-                    let btnText = outlets[i].is_on ? "On" : "Off";
-                    let btnClass = outlets[i].is_on ? "btn-primary" : "btn-outline-primary";
-                    let status = outlets[i].is_on ? "true" : "false";
-                    outletsContainer.innerHTML += `
+                if (outlets) {
+                    // Render each light in the DOM
+                    for (let i = 0; i < outlets.length; i++) {
+                        let btnText = outlets[i].is_on ? "On" : "Off";
+                        let btnClass = outlets[i].is_on ? "btn-primary" : "btn-outline-primary";
+                        let status = outlets[i].is_on ? "true" : "false";
+                        outletsContainer.innerHTML += `
                     <div class="form-group form-row">
                         <label for="outletBtn${i}" class="col-sm-6 col-form-label">Outlet ${i + 1}</label>
                         <div class="col-sm-6">
@@ -53,8 +64,9 @@
                         </div>
                     </div>
                     `
+                    }
+                    this.addEventListeners('.outlet');
                 }
-                this.addEventListeners('.outlet');
             });
         },
 
@@ -64,12 +76,13 @@
             firebase.database().ref('active_room/doors').on('value', snapshot => {
                 doorsContainer.innerHTML = ''
                 const doors = snapshot.val();
-                // Render each light in the DOM
-                for (let i = 0; i < doors.length; i++) {
-                    let btnText = doors[i].is_open ? "Open" : "Closed";
-                    let btnClass = doors[i].is_open ? "btn-success" : "btn-danger";
-                    let status = doors[i].is_open ? "true" : "false";
-                    doorsContainer.innerHTML += `
+                if (doors) {
+                    // Render each light in the DOM
+                    for (let i = 0; i < doors.length; i++) {
+                        let btnText = doors[i].is_open ? "Open" : "Closed";
+                        let btnClass = doors[i].is_open ? "btn-success" : "btn-danger";
+                        let status = doors[i].is_open ? "true" : "false";
+                        doorsContainer.innerHTML += `
                     <div class="form-group form-row">
                         <label for="doorBtn${i}" class="col-sm-6 col-form-label">Door ${i + 1}</label>
                         <div class="col-sm-6">
@@ -77,23 +90,28 @@
                         </div>
                     </div>
                     `
+                    }
+                    this.addEventListeners('.door');
                 }
-                this.addEventListeners('.door');
             });
         },
 
         loadAlarm: function () {
             const alarmBtn = document.getElementById('alarmBtn');
             firebase.database().ref('active_room/alarm').on('value', snapshot => {
-                btnText = snapshot.val() ? 'Alarm On' : 'Alarm Off';
-                alarmBtn.innerHTML = btnText;
+                if (snapshot.val()) {
+                    btnText = snapshot.val() ? 'Alarm On' : 'Alarm Off';
+                    alarmBtn.innerHTML = btnText;
+                }
 
             })
             alarmBtn.addEventListener('click', () => {
                 // Change true to false or false to true in database
                 firebase.database().ref('active_room/alarm').once('value').then(snapshot => {
-                    value = snapshot.val() ? false : true;
-                    firebase.database().ref('active_room/alarm').set(value);
+                    if (snapshot.val()) {
+                        value = snapshot.val() ? false : true;
+                        firebase.database().ref('active_room/alarm').set(value);
+                    }
                 })
             })
         },
