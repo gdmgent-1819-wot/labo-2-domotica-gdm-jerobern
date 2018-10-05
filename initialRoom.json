@@ -1,0 +1,67 @@
+{
+  "active_room" : {
+    "doors" : [ {
+      "is_open" : true,
+      "position" : {
+        "x" : 0,
+        "y" : 6
+      }
+    }, {
+      "is_open" : false,
+      "position" : {
+        "x" : 7,
+        "y" : 6
+      }
+    } ],
+    "lights" : [ {
+      "is_on" : false,
+      "position" : {
+        "x" : 2,
+        "y" : 0
+      }
+    }, {
+      "is_on" : true,
+      "position" : {
+        "x" : 5,
+        "y" : 0
+      }
+    }, {
+      "is_on" : true,
+      "position" : {
+        "x" : 2,
+        "y" : 4
+      }
+    }, {
+      "is_on" : true,
+      "position" : {
+        "x" : 5,
+        "y" : 4
+      }
+    } ],
+    "outlets" : [ {
+      "is_on" : true,
+      "position" : {
+        "x" : 0,
+        "y" : 3
+      }
+    }, {
+      "is_on" : true,
+      "position" : {
+        "x" : 7,
+        "y" : 3
+      }
+    }, {
+      "is_on" : false,
+      "position" : {
+        "x" : 3,
+        "y" : 7
+      }
+    }, {
+      "is_on" : false,
+      "position" : {
+        "x" : 4,
+        "y" : 7
+      }
+    } ]
+  }
+}
