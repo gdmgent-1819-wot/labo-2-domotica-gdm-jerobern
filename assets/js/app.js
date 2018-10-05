@@ -99,19 +99,14 @@
         loadAlarm: function () {
             const alarmBtn = document.getElementById('alarmBtn');
             firebase.database().ref('active_room/alarm').on('value', snapshot => {
-                if (snapshot.val()) {
-                    btnText = snapshot.val() ? 'Alarm On' : 'Alarm Off';
-                    alarmBtn.innerHTML = btnText;
-                }
-
+                btnText = snapshot.val() ? 'Alarm On' : 'Alarm Off';
+                alarmBtn.innerHTML = btnText;
             })
             alarmBtn.addEventListener('click', () => {
                 // Change true to false or false to true in database
                 firebase.database().ref('active_room/alarm').once('value').then(snapshot => {
-                    if (snapshot.val()) {
-                        value = snapshot.val() ? false : true;
-                        firebase.database().ref('active_room/alarm').set(value);
-                    }
+                    value = snapshot.val() ? false : true;
+                    firebase.database().ref('active_room/alarm').set(value);
                 })
             })
         },
