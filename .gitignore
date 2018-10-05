@@ -1,5 +1,5 @@
 
-# Created by https://www.gitignore.io/api/macos,python,firebase
+# Created by https://www.gitignore.io/api/macos,python,firebase,visualstudiocode
 
 ### Firebase ###
 .idea
@@ -166,5 +166,12 @@ dmypy.json
 pyvenv.cfg
 pip-selfcheck.json
 
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# End of https://www.gitignore.io/api/macos,python,firebase
+
+# End of https://www.gitignore.io/api/macos,python,firebase,visualstudiocode
