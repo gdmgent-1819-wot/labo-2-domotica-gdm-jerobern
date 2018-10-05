@@ -2,9 +2,17 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 from sense_hat import SenseHat
+import pygame
 from time import time, sleep
 import os
 import sys
+
+try:
+    pygame.init()
+    alarm_sound = pygame.mixer.Sound('../assets/sounds/alarm.wav')
+except:
+    print('Unable to load alarm sound')
+    sys.exit(1)
 
 # Update with firebase info
 serviceAccountKey = '../serviceAccountKey.json'
@@ -74,17 +82,18 @@ def alarm_changed_handler(args):
             position = light['position']
             color = (255, 255, 0)
             sense.set_pixel(int(position['x']), int(position['y']), (255, 255, 0))
-            sleep(0.1)
+            sleep(0.15)
             sense.set_pixel(int(position['x']), int(position['y']), (51, 51, 0))
         for door in doors: 
             position = door['position']
             sense.set_pixel(int(position['x']), int(position['y']) - 1, (0, 255, 0))
             sense.set_pixel(int(position['x']), int(position['y']), (0, 255, 0))
             sense.set_pixel(int(position['x']), int(position['y']) + 1, (0, 255, 0))
-            sleep(0.1)
+            sleep(0.15)
             sense.set_pixel(int(position['x']), int(position['y']) - 1, (255, 0, 0))
             sense.set_pixel(int(position['x']), int(position['y']), (255, 0, 0))
             sense.set_pixel(int(position['x']), int(position['y']) + 1, (255, 0, 0))
+        alarm_sound.play()
         alarm_is_on = firebase_ref_alarm.get();
 
 def main():
