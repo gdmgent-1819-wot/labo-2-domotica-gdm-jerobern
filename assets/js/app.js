@@ -5,17 +5,35 @@
             console.log("Initializing application");
             firebase.initializeApp(firebaseConfig);
             // Check if database has a value for active_room
-            firebase.database().ref('active_room').once('value').then(snapshot => {
+            firebase.database().ref('active_room/lights').once('value').then(snapshot => {
                 if (!snapshot.val()) {
                     console.log('Database was empty, setting initial data');
                     firebase.database().ref().set(initialRoom);
                 }
             })
+            this.loadConditions();
             this.loadLights();
             this.loadOutlets();
             this.loadDoors();
             this.loadAlarm();
 
+        },
+
+        loadConditions: function () {
+            const tempEl = document.getElementById('temperature');
+            const humidityEl = document.getElementById('humidity');
+            firebase.database().ref('active_room/temperature').on('value', snapshot => {
+                let temp = snapshot.val()
+                if (temp) {
+                    tempEl.innerHTML = `Temperature: ${temp}°C`;
+                }
+            });
+            firebase.database().ref('active_room/humidity').on('value', snapshot => {
+                let hum = snapshot.val()
+                if (hum) {
+                    humidityEl.innerHTML = `Humidity: ${hum}%`;
+                }
+            });
         },
 
         loadLights: function () {

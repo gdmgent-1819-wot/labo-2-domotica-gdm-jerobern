@@ -22,6 +22,9 @@ lights = dict();
 outlets = dict();
 doors = dict();
 
+# constants
+TEMP_CORRECTION_FACTOR = 1
+
 try:
     # Fetch the service account key JSON file contents
     firebase_cred = credentials.Certificate(serviceAccountKey)
@@ -34,6 +37,8 @@ try:
     # As an admin, the app has access to read and write all data
     firebase_ref_active_room = db.reference('active_room')
     firebase_ref_alarm = db.reference('active_room/alarm')
+    firebase_ref_temperature = db.reference('active_room/temperature')
+    firebase_ref_humidity = db.reference('active_room/humidity')
 except:
     print('Unable to initialize Firebase: {}'.format(sys.exc_info()[0]))
     sys.exit(1)
@@ -45,6 +50,35 @@ try:
 except:
     print('Unable to initialize the Sense Hat library: {}'.format(sys.exc_info()[0]))
     sys.exit(1)
+
+# get the CPU temperature
+def get_cpu_temp():
+    res = os.popen('vcgencmd measure_temp').readline()
+    t = float(res.replace('temp=', '').replace("'C\n", ''))
+    return(t)
+
+# use moving average to smooth readings
+def get_smooth(x):
+  if not hasattr(get_smooth, "t"):
+    get_smooth.t = [x,x,x]
+  get_smooth.t[2] = get_smooth.t[1]
+  get_smooth.t[1] = get_smooth.t[0]
+  get_smooth.t[0] = x
+  xs = (get_smooth.t[0]+get_smooth.t[1]+get_smooth.t[2])/3
+  return(xs)
+
+# get the real temperature
+def get_temp(with_case):
+    temp_humidity = sense.get_temperature_from_humidity()
+    temp_pressure = sense.get_temperature_from_pressure()
+    temp = (temp_humidity + temp_pressure)/2
+    if with_case:
+        temp_cpu = get_cpu_temp()
+        temp_corrected = temp - ((temp_cpu - temp)/TEMP_CORRECTION_FACTOR)
+        temp_smooth = get_smooth(temp_corrected)
+    else:
+        temp_smooth = get_smooth(temp)
+    return(temp_smooth)
 
 def room_changed_handler(args):
     active_room = firebase_ref_active_room.get()
@@ -100,7 +134,11 @@ def main():
     firebase_ref_active_room.listen(room_changed_handler)
     firebase_ref_alarm.listen(alarm_changed_handler)
     while True:
-        sleep(0.1)
+        temp = round(get_temp(True));
+        humidity = round(sense.get_humidity())
+        firebase_ref_temperature.set(temp);
+        firebase_ref_humidity.set(humidity);
+        sleep(10)
         
 if __name__ == "__main__":
     try:
